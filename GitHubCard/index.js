@@ -7,7 +7,7 @@ const gitHubCardList = document.querySelector(".cards");
 axios
   .get('https://api.github.com/users/ngaivoronski')
   .then(response => {
-    const newCard = gitHubCard(response);
+    const newCard = gitHubCard(response.data);
     gitHubCardList.appendChild(newCard);
 })
 
@@ -47,9 +47,9 @@ const followersArray = [
 axios
   .all(followersArray.map(user => axios.get('https://api.github.com/users/' + user)))
   .then(response => {
-    console.log(response);
     response.forEach(item => {
-      const newCard = gitHubCard(item);
+      console.log(item);
+      const newCard = gitHubCard(item.data);
       gitHubCardList.appendChild(newCard);
     })
 })
@@ -101,18 +101,18 @@ function gitHubCard(obj) {
 
   // constructor API pulled content
   newCard.classList.add("card");
-  newImg.src = obj.data.avatar_url;
+  newImg.src = obj.avatar_url;
   cardInfo.classList.add('card-info');
   cardName.classList.add('card-name');
-  cardName.textContent = obj.data.name;
+  cardName.textContent = obj.name;
   cardUserName.classList.add('username');
-  cardUserName.textContent = obj.data.login;
-  cardLocation.textContent = 'Location: ' + obj.data.location;
+  cardUserName.textContent = obj.login;
+  cardLocation.textContent = 'Location: ' + obj.location;
   cardProfile.textContent = 'Profile : ';
-  cardProfileLink.src = obj.data.url;
-  cardFollowers.textContent = 'Followers: ' + obj.data.followers;
-  cardFollowing.textContent = 'Following: ' + obj.data.following;
-  cardBio.textContent = 'Bio: ' + obj.data.bio;
+  cardProfileLink.src = obj.url;
+  cardFollowers.textContent = 'Followers: ' + obj.followers;
+  cardFollowing.textContent = 'Following: ' + obj.following;
+  cardBio.textContent = 'Bio: ' + obj.bio;
   
   return newCard;
 }
@@ -124,3 +124,24 @@ function gitHubCard(obj) {
   luishrd
   bigknell
 */
+
+// STRETCH - Automatic Friends list
+
+function automaticFriendsList(user) {
+  axios
+    .get('https://api.github.com/users/' + user)
+    .then(response => {
+      axios
+        .get(response.data.followers_url)
+        .then(followersList => {
+          console.log(followersList);
+          followersList.data.forEach(follower => {
+            console.log(follower);
+            const newCard = gitHubCard(follower);
+            gitHubCardList.appendChild(newCard);
+          })
+        })
+  })
+}
+
+automaticFriendsList('tetondan');
